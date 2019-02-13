@@ -770,12 +770,8 @@ class Network:
         num_items = in_arrays[0].shape[0]
         if minibatch_size is None:
             minibatch_size = num_items
-        key = str([list(sorted(dynamic_kwargs.items())),
-                   num_gpus,
-                   out_mul,
-                   out_add,
-                   out_shrink,
-                   out_dtype])
+        key = str([list(sorted(dynamic_kwargs.items())), num_gpus, out_mul, out_add, out_shrink, out_dtype])
+
         # Build graph. Same is in Run fuction.
         if key not in self._run_cache:
             with absolute_name_scope(self.scope + '/Run'), tf.control_dependencies(None):
@@ -783,20 +779,14 @@ class Network:
                 out_split = []
                 for gpu in range(num_gpus):
                     with tf.device('/gpu:%d' % gpu):
-                        out_expr = self.get_output_for(*in_split[gpu],
-                                                       return_as_list=True,
-                                                       **dynamic_kwargs)
+                        out_expr = self.get_output_for(*in_split[gpu], return_as_list=True, **dynamic_kwargs)
                         if out_mul != 1.0:
                             out_expr = [x * out_mul for x in out_expr]
                         if out_add != 0.0:
                             out_expr = [x + out_add for x in out_expr]
                         if out_shrink > 1:
                             ksize = [1, 1, out_shrink, out_shrink]
-                            out_expr = [tf.nn.avg_pool(x,
-                                                       ksize=ksize,
-                                                       strides=ksize,
-                                                       padding='VALID',
-                                                       data_format='NCHW') for x in out_expr]
+                            out_expr = [tf.nn.avg_pool(x, ksize=ksize, strides=ksize, padding='VALID', data_format='NCHW') for x in out_expr]
                         if out_dtype is not None:
                             if tf.as_dtype(out_dtype).is_integer:
                                 out_expr = [tf.round(x) for x in out_expr]
@@ -846,14 +836,10 @@ class Network:
                     edge1 = np.where(latents[j] >= 1.)[0]
                     edge2 = np.where(latents[j] <= -1)[0]
                     if edge1.shape[0] > 0:
-                        rand_el1 = np.random.uniform(-1,
-                                                     1,
-                                                     size=(1, edge1.shape[0]))
+                        rand_el1 = np.random.uniform(-1, 1, size=(1, edge1.shape[0]))
                         latents[j, edge1] = rand_el1
                     if edge2.shape[0] > 0:
-                        rand_el2 = np.random.uniform(-1,
-                                                     1,
-                                                     size=(1, edge2.shape[0]))
+                        rand_el2 = np.random.uniform(-1, 1, size=(1, edge2.shape[0]))
                         latents[j, edge2] = rand_el2
             else:
                 latents = np.clip(latents, -1, 1)
