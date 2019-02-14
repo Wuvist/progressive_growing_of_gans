@@ -14,15 +14,16 @@ session._default_session = session.as_default()
 session._default_session.enforce_nesting = False
 session._default_session.__enter__() # pylint: disable=no-member
 
-celeba = "karras2018iclr-celebahq-1024x1024.pkl"
-cats  = "karras2018iclr-lsun-cat-256x256.pkl"
+
+celeba = "karras2018iclr-celebahq-1024x1024.pkl" # https://drive.google.com/file/d/188K19ucknC6wg1R6jbuPEhTq9zoufOx4/view?usp=sharing
+cats  = "karras2018iclr-lsun-cat-256x256.pkl" # https://drive.google.com/file/d/1xuFIDNAO_A_fVU0jFcgQd_C9A4Fn8GnT/view?usp=sharing
 
 with open(cats, 'rb') as file:
     G, D, Gs = pickle.load(file)
 
 # Generate latent vectors.
 latents = np.random.RandomState(1).randn(1, *Gs.input_shapes[0][1:]) # 1000 random latents
-latents = latents[[0]] # hand-picked top-10
+latents = latents[[0]] # hand-picked top-1
 # latents = np.stack(np.random.RandomState(1).randn(Gs.input_shape[1]))
 
 # Generate dummy labels (not used by the official networks).
@@ -46,9 +47,6 @@ def save_image(fname, data) :
 
 img = load_image("ww256.png")
 history = Gs.reverse_gan_for_etalons(latents, labels, img)
-# img = img.transpose(3, 1, 2)
-
-
 
 data = history[-1][1]
 
