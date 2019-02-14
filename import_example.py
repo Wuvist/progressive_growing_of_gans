@@ -7,7 +7,7 @@ from PIL import Image
 # tf.InteractiveSession()
 
 config_proto = tf.ConfigProto()
-config_proto.gpu_options.per_process_gpu_memory_fraction = 0.4
+config_proto.gpu_options.per_process_gpu_memory_fraction = 0.9
 config_proto.gpu_options.allow_growth = True
 session = tf.Session(config=config_proto)
 session._default_session = session.as_default()
@@ -30,26 +30,34 @@ latents = latents[[0]] # hand-picked top-1
 labels = np.zeros([latents.shape[0]] + Gs.input_shapes[1][1:])
 
 
-def load_image( infilename ) :
-    img = Image.open( infilename )
-    # img.resize((256, 256), Image.ANTIALIAS)
+def load_image(fname, size = None):
+    img = Image.open(fname)
+    if size != None:
+        img = img.resize(size, Image.ANTIALIAS)
     data = np.asarray(img, dtype="float32") / 255
     data = np.expand_dims(data, axis=0)
     data = np.transpose(data, [0, 3, 1, 2])
     return data
 
-def save_image(fname, data) :
-	images = np.clip(np.rint((data + 1.0) / 2.0 * 255.0), 0.0, 255.0).astype(np.uint8) # [-1,1] => [0,255]
-	images = images.transpose(0, 2, 3, 1) # NCHW => NHWC
+def save_images(fname, data) :
+    images = np.clip(np.rint(data * 255.0), 0.0, 255.0).astype(np.uint8) # [-1,1] => [0,255]
+    images = images.transpose(0, 2, 3, 1) # NCHW => NHWC
 
-	# Save images as PNG.
-	Image.fromarray(images[0], 'RGB').save(fname)
+    size = images.shape[0]
+    if size == 1:
+        Image.fromarray(images[0], 'RGB').save(fname)
+        return
 
-img = load_image("ww256.png")
+    fname = fname.rsplit(".", 1)
+    for i in range(size):
+        Image.fromarray(images[i], 'RGB').save(fname[0] + str(i) + "." + fname[1])
+	
+
+img = load_image("ww.jpg", (256, 256))
 history = Gs.reverse_gan_for_etalons(latents, labels, img)
 
 data = history[-1][1]
 
 images = Gs.run(data, labels)
 
-save_image("r1.png", images)
+save_images("r.png", images)
