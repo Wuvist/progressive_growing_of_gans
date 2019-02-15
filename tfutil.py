@@ -797,20 +797,12 @@ class Network:
         # UP until now we were making a Tensor for model
         out_expr = self._run_cache[key]
         # Let's make a loss function:
-        psy_name = str(self.scope + '/etalon')
-        psy = tf.placeholder(tf.float32, out_expr[0].shape, name=psy_name)
         # MSE loss for all etalons.
-        loss = tf.reduce_sum(tf.pow(out_expr[0] - psy, 2))
-        latents_name = self.input_templates[0].name
-        input_latents = tf.get_default_graph().get_tensor_by_name(latents_name)
+        loss = tf.reduce_sum(tf.pow(out_expr[0] - in_arrays[2], 2))
         # Let's compute the gradient of loss function with regard to input:
-        gradient = tf.gradients(loss, input_latents)
-        # We modify existing template to feed etalons
-        # into the loss and gradient tensors:
-        templ = self.input_templates
-        templ.append(psy)
+        gradient = tf.gradients(loss, self.input_templates[0])
         # Create a new feed dictionary:
-        feed_dict = dict(zip(templ, in_arrays))
+        feed_dict = dict(zip(self.input_templates, in_arrays))
         # Return loss and the gradient with it's feed dictionary
         l_rate = learning_rate
         latents = in_arrays[0]
