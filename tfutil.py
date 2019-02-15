@@ -753,7 +753,7 @@ class Network:
     # Returns the history of latents with the last solution being the best.
     def reverse_gan_for_etalons(self,
         *in_arrays,                 # Expects start values of latents, any labels and etalon images.
-        itterations = 100,          # How many optimisations itterations to take. Emperical good value is 2000.
+        itterations = 5,          # How many optimisations itterations to take. Emperical good value is 2000.
         learning_rate = 0.000001,   # Initial learning rate
         stohastic_clipping = True,
         return_as_list  = False,    # True = return a list of NumPy arrays, False = return a single NumPy array, or a tuple if there are multiple outputs.

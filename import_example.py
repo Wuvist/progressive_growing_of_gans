@@ -53,7 +53,8 @@ def save_images(fname, data) :
         Image.fromarray(images[i], 'RGB').save(fname[0] + str(i) + "." + fname[1])
 	
 
-img = load_image("ww.jpg", (256, 256))
+img = load_image("start.png", (256, 256))
+
 history = Gs.reverse_gan_for_etalons(latents, labels, img)
 
 data = history[-1][1]
