@@ -825,9 +825,7 @@ class Network:
         # Adversarial Networks', ICLR 2017 workshop track
         # [arxiv]. https://arxiv.org/abs/1702.04782
         for i in range(itterations):
-            g = tf.get_default_session().run(
-                [loss, gradient],
-                feed_dict=feed_dict)
+            g = tf.get_default_session().run([loss, gradient], feed_dict=feed_dict)
             latents = latents - l_rate * g[1][0]
             # Standard clipping
             if stohastic_clipping:
